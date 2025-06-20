@@ -88,5 +88,6 @@ namespace SurvivalChaos
         }
 
         // Additional behaviour (movement, death rewards, etc.) would go here.
+
     }
 }
