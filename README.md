@@ -42,4 +42,8 @@ The starter includes minimal implementations of several gameplay systems:
 2. Open the **Bootstrap** scene and press **Play** – the stub managers should initialise without errors.  
 3. Extend the scripts in **Assets/_Project/Scripts** to flesh out gameplay features such as wave spawning, upgrades, AI, and hero abilities.
 
+### Unit Prefabs & Combat
+
+Basic unit combat has been implemented in `UnitController`. Attach the script to a prefab and assign a `UnitData` asset with `baseHP`, `baseAttack`, `attackCooldown`, and `attackRange` values. When spawned, units will look for the closest enemy within range and automatically deal damage every `attackCooldown` seconds. Units are destroyed when their health reaches zero.
+
 Happy modding!
