@@ -4,6 +4,13 @@ namespace SurvivalChaos
 {
     public class HeroController : MonoBehaviour
     {
-        // TODO: Implement functionality
+
+        private PlayerInfo owner;
+
+        public void Init(PlayerInfo player)
+        {
+            owner = player;
+        }
+
     }
 }
