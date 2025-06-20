@@ -8,30 +8,40 @@ namespace SurvivalChaos
     public class GameManager : MonoBehaviour
     {
         public static GameManager Instance { get; private set; }
+
         public GameState State { get; private set; } = GameState.Pregame;
-        public List<PlayerInfo> ActivePlayers { get; private set; } = new List<PlayerInfo>();
+        public List<PlayerInfo> ActivePlayers { get; private set; } = new();
 
         private void Awake()
         {
             if (Instance != null && Instance != this)
             {
-                UnityEngine.Object.Destroy(gameObject);
+                Destroy(gameObject);
                 return;
             }
+
             Instance = this;
-            UnityEngine.Object.DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad(gameObject);
         }
 
+        /// <summary>
+        /// Starts a new game with the provided players.
+        /// </summary>
         public void StartGame(List<PlayerInfo> players)
         {
-            ActivePlayers = players;
+            ActivePlayers = players ?? new List<PlayerInfo>();
             State = GameState.Running;
         }
 
+        /// <summary>
+        /// Removes a player from the match and ends the game if one (or none) remain.
+        /// </summary>
         public void EliminatePlayer(PlayerInfo player)
         {
-            if (!ActivePlayers.Contains(player)) return;
+            if (player == null || !ActivePlayers.Contains(player)) return;
+
             ActivePlayers.Remove(player);
+
             if (ActivePlayers.Count <= 1)
             {
                 State = GameState.Victory;

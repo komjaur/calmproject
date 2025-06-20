@@ -86,3 +86,28 @@ crashlytics-build.properties
 /[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Flow/UnitOptions.db.meta
 /[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Core/Property Providers
 /[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Core/Property Providers.meta
+
+
+# Crashlytics generated file
+crashlytics-build.properties
+
+# Packed Addressables
+/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
+
+# Temporary auto-generated Android Assets
+/[Aa]ssets/[Ss]treamingAssets/aa.meta
+/[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# Visual Scripting auto-generated files (safe to regenerate)
+/Assets/Unity.VisualScripting.Generated/**
+
+# Keep every other *.meta* file in the repo
+!/[Aa]ssets/**/*.meta
+
+# Rider / IntelliJ
+/.idea/
+
+# macOS
+.DS_Store
+.Spotlight-V100
+.Trashes
