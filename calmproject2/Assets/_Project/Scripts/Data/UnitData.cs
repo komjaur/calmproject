@@ -1,9 +1,17 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SurvivalChaos
 {
-    public class UnitData : MonoBehaviour
+    [CreateAssetMenu(menuName = "SC/Unit")]
+    public class UnitData : ScriptableObject
     {
-        // TODO: Implement functionality
+        public string id;
+        public Race race;
+        public GameObject prefab;
+        public float baseHP;
+        public float baseAttack;
+        public float goldBounty;
+        public List<UpgradeModifier> modifiers; // e.g., +1 armor per level
     }
 }
