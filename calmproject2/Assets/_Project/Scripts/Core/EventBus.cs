@@ -1,7 +1,7 @@
 
 using System;
 using System.Collections.Generic;
-
+using UnityEngine;
 namespace SurvivalChaos
 {
     public static class EventBus
@@ -31,8 +31,8 @@ namespace SurvivalChaos
             if (events.TryGetValue(typeof(T), out var del))
                 (del as Action<T>)?.Invoke(evt);
         }
+}
 
-using UnityEngine;
 
 namespace SurvivalChaos
 {
