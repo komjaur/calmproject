@@ -10,6 +10,8 @@ namespace SurvivalChaos
     {
         // Maps each upgrade ID to its current level.
         private readonly Dictionary<string, int> upgradeLevels = new();
+        // Tracks flat stat modifiers accumulated from upgrades and bonuses.
+        private readonly Dictionary<string, float> statModifiers = new();
 
         /// <summary>
         /// Increments the level of a given upgrade.  
@@ -25,6 +27,13 @@ namespace SurvivalChaos
             }
 
             upgradeLevels[data.id]++;
+            if (data.modifiers != null)
+            {
+                foreach (var mod in data.modifiers)
+                {
+                    mod?.Apply(this);
+                }
+            }
         }
 
         /// <summary>
@@ -33,6 +42,30 @@ namespace SurvivalChaos
         public int GetLevel(string id)
         {
             return upgradeLevels.TryGetValue(id, out int level) ? level : 0;
+        }
+
+        /// <summary>
+        /// Adds a numeric modifier for the given stat.
+        /// </summary>
+        public void ApplyModifier(string stat, float value)
+        {
+            if (string.IsNullOrEmpty(stat))
+                return;
+
+            if (!statModifiers.ContainsKey(stat))
+            {
+                statModifiers[stat] = 0f;
+            }
+
+            statModifiers[stat] += value;
+        }
+
+        /// <summary>
+        /// Gets the current modifier value for a stat, or 0 if none exists.
+        /// </summary>
+        public float GetModifier(string stat)
+        {
+            return statModifiers.TryGetValue(stat, out float val) ? val : 0f;
         }
     }
 }
