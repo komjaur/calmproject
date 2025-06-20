@@ -1,6 +1,6 @@
 
-using System.Collections.Generic;
-
+                UnityEngine.Object.Destroy(gameObject);
+            UnityEngine.Object.DontDestroyOnLoad(gameObject);
 
 using UnityEngine;
 
