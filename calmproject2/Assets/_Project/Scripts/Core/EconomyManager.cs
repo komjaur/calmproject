@@ -4,6 +4,7 @@ namespace SurvivalChaos
 {
     public class EconomyManager : MonoBehaviour
     {
+
         public float incomeInterval = 15f;
         private float timer;
 
@@ -20,5 +21,8 @@ namespace SurvivalChaos
                 EventBus.Raise(new IncomeTickEvent());
             }
         }
+
+        // TODO: Implement functionality
+
     }
 }

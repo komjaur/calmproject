@@ -1,10 +1,14 @@
+
 using System.Collections.Generic;
+=======
+
 using UnityEngine;
 
 namespace SurvivalChaos
 {
     public class SpecialWeaponManager : MonoBehaviour
     {
+
         public float cooldown = 90f;
         private readonly Dictionary<PlayerInfo, float> nextFireTime = new Dictionary<PlayerInfo, float>();
 
@@ -21,5 +25,6 @@ namespace SurvivalChaos
         {
             return nextFireTime.TryGetValue(p, out var t) ? t : 0f;
         }
+
     }
 }

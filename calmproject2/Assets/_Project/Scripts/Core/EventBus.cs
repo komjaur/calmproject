@@ -1,3 +1,4 @@
+
 using System;
 using System.Collections.Generic;
 
@@ -30,5 +31,14 @@ namespace SurvivalChaos
             if (events.TryGetValue(typeof(T), out var del))
                 (del as Action<T>)?.Invoke(evt);
         }
+
+using UnityEngine;
+
+namespace SurvivalChaos
+{
+    public class EventBus : MonoBehaviour
+    {
+        // TODO: Implement functionality
+
     }
 }

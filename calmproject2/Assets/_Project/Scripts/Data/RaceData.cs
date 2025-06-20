@@ -1,8 +1,11 @@
+
 using System.Collections.Generic;
+
 using UnityEngine;
 
 namespace SurvivalChaos
 {
+
     [CreateAssetMenu(menuName = "SC/Race")]
     public class RaceData : ScriptableObject
     {
@@ -11,5 +14,10 @@ namespace SurvivalChaos
         public List<UpgradeData> upgrades;
         public GameObject heroPrefab;
         public GameObject specialWeaponPrefab;
+
+    public class RaceData : MonoBehaviour
+    {
+        // TODO: Implement functionality
+
     }
 }

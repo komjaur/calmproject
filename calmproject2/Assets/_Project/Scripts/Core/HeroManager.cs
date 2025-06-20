@@ -1,10 +1,14 @@
+
 using System.Collections.Generic;
+=======
+
 using UnityEngine;
 
 namespace SurvivalChaos
 {
     public class HeroManager : MonoBehaviour
     {
+
         public float heroCooldown = 60f;
         private readonly Dictionary<PlayerInfo, float> nextHeroTime = new Dictionary<PlayerInfo, float>();
 
@@ -21,5 +25,6 @@ namespace SurvivalChaos
         {
             return nextHeroTime.TryGetValue(p, out var t) ? t : 0f;
         }
+
     }
 }

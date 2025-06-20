@@ -4,6 +4,7 @@ namespace SurvivalChaos
 {
     public class BuildingController : MonoBehaviour
     {
+
         public PlayerInfo owner;
         public BuildingData data;
         public float currentHP;
@@ -23,5 +24,6 @@ namespace SurvivalChaos
                 EventBus.Raise(new BuildingDestroyedEvent(this));
             }
         }
+
     }
 }

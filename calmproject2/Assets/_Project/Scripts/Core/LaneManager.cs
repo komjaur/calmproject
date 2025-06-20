@@ -4,6 +4,7 @@ namespace SurvivalChaos
 {
     public class LaneManager : MonoBehaviour
     {
+
         public Lane[] lanes;
         public float defaultWaveInterval = 20f;
 
@@ -15,5 +16,6 @@ namespace SurvivalChaos
                 lane.waveInterval = defaultWaveInterval;
             }
         }
+
     }
 }

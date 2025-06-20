@@ -4,6 +4,7 @@ namespace SurvivalChaos
 {
     public class UnitController : MonoBehaviour
     {
+
         private PlayerInfo owner;
         private UnitData data;
 
@@ -12,5 +13,6 @@ namespace SurvivalChaos
             this.owner = owner;
             this.data = data;
         }
+
     }
 }

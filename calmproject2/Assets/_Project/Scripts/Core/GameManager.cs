@@ -1,8 +1,12 @@
+
 using System.Collections.Generic;
+
+
 using UnityEngine;
 
 namespace SurvivalChaos
 {
+
     public enum GameState { Pregame, Running, Victory, Loss }
 
     public class GameManager : MonoBehaviour
@@ -39,5 +43,10 @@ namespace SurvivalChaos
                 EventBus.Raise(new GameEndedEvent(winner));
             }
         }
+
+    public class GameManager : MonoBehaviour
+    {
+        // TODO: Implement functionality
+
     }
 }

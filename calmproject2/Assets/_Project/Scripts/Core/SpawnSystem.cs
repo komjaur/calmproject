@@ -4,6 +4,7 @@ namespace SurvivalChaos
 {
     public class SpawnSystem : MonoBehaviour
     {
+
         private void OnEnable()
         {
             EventBus.Subscribe<WaveSpawnEvent>(OnWaveSpawn);
@@ -32,5 +33,6 @@ namespace SurvivalChaos
                 }
             }
         }
+
     }
 }
