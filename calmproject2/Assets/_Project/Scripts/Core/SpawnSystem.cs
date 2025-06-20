@@ -4,35 +4,31 @@ namespace SurvivalChaos
 {
     public class SpawnSystem : MonoBehaviour
     {
+        private void OnEnable()  => EventBus.Subscribe<WaveSpawnEvent>(OnWaveSpawn);
+        private void OnDisable() => EventBus.Unsubscribe<WaveSpawnEvent>(OnWaveSpawn);
 
-        private void OnEnable()
-        {
-            EventBus.Subscribe<WaveSpawnEvent>(OnWaveSpawn);
-        }
-
-        private void OnDisable()
-        {
-            EventBus.Unsubscribe<WaveSpawnEvent>(OnWaveSpawn);
-        }
-
+        /// <summary>
+        /// Spawns the appropriate unit for each active player when a wave is triggered.
+        /// </summary>
         private void OnWaveSpawn(WaveSpawnEvent evt)
         {
             foreach (var player in GameManager.Instance.ActivePlayers)
             {
-                UnitData ud = null; // Acquire from player race/upgrade manager.
-                // Placeholder: no spawn if not assigned
-                if (ud == null || ud.prefab == null) continue;
+                // TODO: Retrieve the correct UnitData from the player’s race/upgrade manager.
+                UnitData unitData = null;
 
-                Transform sp = evt.lane.GetSpawnPoint(player.id);
-                if (sp != null)
+                if (unitData?.prefab == null) continue;   // Skip if no prefab available
+
+                Transform spawnPoint = evt.lane.GetSpawnPoint(player.id);
+                if (spawnPoint == null) continue;
+
+                var unit = Instantiate(unitData.prefab, spawnPoint.position, Quaternion.identity);
+
+                if (unit.TryGetComponent(out UnitController controller))
                 {
-                    var unit = Instantiate(ud.prefab, sp.position, Quaternion.identity);
-                    var ctrl = unit.GetComponent<UnitController>();
-                    if (ctrl != null)
-                        ctrl.Init(player, ud);
+                    controller.Init(player, unitData);
                 }
             }
         }
-
     }
 }
