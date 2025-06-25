@@ -32,8 +32,15 @@ namespace SurvivalChaos
 
         [Tooltip("Gold bounty awarded when this unit is killed.")]
         public float goldBounty;
+            [Header("Movement & AI")]
+    [Tooltip("How far this unit can 'see' when looking for targets.")]
+    public float searchRadius = 8f;
 
-        [Tooltip("Optional per-upgrade modifiers (e.g., +1 armor per Blacksmith level).")]
-        public List<UpgradeModifier> modifiers = new();
+    [Tooltip("NavMeshAgent speed for this unit.")]
+    public float moveSpeed = 2f;
+
+        [Tooltip("Prefab to fire when this unit attacks. If left null the attack is instant-melee.")]
+        public Projectile projectilePrefab;   // <- new
+
     }
 }

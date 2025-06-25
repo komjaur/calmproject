@@ -15,8 +15,7 @@ namespace SurvivalChaos
         [Tooltip("Unit types available to this race, ideally in build/tech order.")]
         public List<UnitData> units = new();
 
-        [Tooltip("Research or tech upgrades specific to this race.")]
-        public List<UpgradeData> upgrades = new();
+ 
 
         [Tooltip("The default hero prefab granted to the player at hero summon.")]
         public GameObject heroPrefab;

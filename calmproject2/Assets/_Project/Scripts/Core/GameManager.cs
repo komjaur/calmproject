@@ -33,21 +33,6 @@ namespace SurvivalChaos
             State = GameState.Running;
         }
 
-        /// <summary>
-        /// Removes a player from the match and ends the game if one (or none) remain.
-        /// </summary>
-        public void EliminatePlayer(PlayerInfo player)
-        {
-            if (player == null || !ActivePlayers.Contains(player)) return;
-
-            ActivePlayers.Remove(player);
-
-            if (ActivePlayers.Count <= 1)
-            {
-                State = GameState.Victory;
-                var winner = ActivePlayers.Count == 1 ? ActivePlayers[0] : null;
-                EventBus.Raise(new GameEndedEvent(winner));
-            }
-        }
+   
     }
 }
