@@ -40,7 +40,10 @@ namespace SurvivalChaos
             CurrentHP = data != null ? data.baseHP : 0f;
             _attackTimer = 0f;
 
-            // Optional: Apply visuals or team material here
+            // Apply the owner's team colour if a SpriteRenderer is present
+            var sr = GetComponentInChildren<SpriteRenderer>();
+            if (sr != null)
+                sr.color = owner.color;
         }
 
         private void Update()

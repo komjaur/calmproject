@@ -18,7 +18,12 @@ namespace SurvivalChaos
         public void Init(PlayerInfo player)
         {
             Owner = player;
-            // Add more hero-initialisation logic here (e.g., set team colours, stats, abilities).
+            // Apply team colour if a SpriteRenderer is present
+            var sr = GetComponentInChildren<SpriteRenderer>();
+            if (sr != null)
+                sr.color = player.color;
+
+            // Add more hero-initialisation logic here (e.g., stats, abilities).
         }
     }
 }
