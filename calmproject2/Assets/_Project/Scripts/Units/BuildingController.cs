@@ -24,6 +24,11 @@ namespace SurvivalChaos
             this.owner = owner;
             this.data  = data;
             currentHP  = data != null ? data.maxHP : 0f;
+
+            // Apply team colour if a SpriteRenderer is present
+            var sr = GetComponentInChildren<SpriteRenderer>();
+            if (sr != null)
+                sr.color = owner.color;
         }
 
         /// <summary>
