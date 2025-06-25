@@ -1,76 +1,107 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;                 // 2-D NavMesh
 
 namespace SurvivalChaos
 {
-    /// <summary>
-    /// Runtime component that tracks a regular combat unit’s owner, data, and behaviour hooks.
-    /// </summary>
+    [RequireComponent(typeof(NavMeshAgent))]
     public class UnitController : MonoBehaviour
     {
+        /* ───── Inspector ───── */
+
         [Header("Editor Configuration")]
-
-        [Tooltip("Assign this unit's owner in the editor for testing.")]
         [SerializeField] private PlayerInfo _owner;
+        [SerializeField] private UnitData   _data;
 
-        [Tooltip("Assign this unit's base data (HP, attack, cooldown, etc.).")]
-        [SerializeField] private UnitData _data;
+        [Header("Movement & AI")]
+        [SerializeField] private float searchRadius = 8f;
+        [SerializeField] private float moveSpeed    = 2f;
 
-        /// <summary>The player who owns this unit.</summary>
-        public PlayerInfo Owner { get; private set; }
+        /* ───── Public runtime properties ───── */
 
-        /// <summary>Static data describing this unit’s base stats and modifiers.</summary>
-        public UnitData Data { get; private set; }
+        public PlayerInfo Owner   { get; private set; }
+        public UnitData   Data    { get; private set; }
+        public float      CurrentHP { get; private set; }
 
-        /// <summary>Current hit points for this unit.</summary>
-        public float CurrentHP { get; private set; }
+        /* ───── Private state ───── */
 
-        private float _attackTimer;
+        float            _attackTimer;
+        UnitController   _target;
+        NavMeshAgent     _agent;
 
-        private void Awake()
+        /* ───────────────────────────────────────────────────────────── */
+
+        void Awake()
         {
             if (_owner != null && _data != null)
                 Init(_owner, _data);
+
+            _agent = GetComponent<NavMeshAgent>();
+            _agent.updateRotation = false; // keep sprite upright
+#if UNITY_2022_1_OR_NEWER
+            _agent.updateUpAxis   = false; // XY plane
+#endif
+            _agent.speed           = moveSpeed;
+            _agent.stoppingDistance = _data != null ? _data.attackRange : 0.5f;
         }
 
         public void Init(PlayerInfo owner, UnitData data)
         {
             Owner = owner;
-            Data = data;
+            Data  = data;
 
-            CurrentHP = data != null ? data.baseHP : 0f;
+            CurrentHP   = data != null ? data.baseHP : 0f;
             _attackTimer = 0f;
 
-            // Apply the owner's team colour if a SpriteRenderer is present
-            var sr = GetComponentInChildren<SpriteRenderer>();
+                var sr = GetComponentInChildren<SpriteRenderer>();
             if (sr != null)
-                sr.color = owner.color;
+            {
+                Shader teamShader = Shader.Find("Sprites/PlayerTeamColorSwap");
+                if (teamShader != null)
+                {
+                    var mat = new Material(teamShader);
+                    mat.SetColor("_TintColor", owner.color);
+                    sr.material = mat;
+                }
+            }
         }
 
-        private void Update()
+        /* ───────────────────────────────────────────────────────────── */
+
+        void Update()
         {
             if (Data == null || CurrentHP <= 0f) return;
 
+            // Refresh / acquire a target
+            if (_target == null || _target.CurrentHP <= 0f)
+                _target = FindNearestEnemy();
+
+            if (_target == null) { _agent.ResetPath(); return; }          // Idle
+
+            // Pursue & attack
+            _agent.SetDestination(_target.transform.position);
+
+            if (_agent.remainingDistance <= _agent.stoppingDistance + 0.05f)
+                TryAttack();
+        }
+
+        void TryAttack()
+        {
             _attackTimer += Time.deltaTime;
             if (_attackTimer < Data.attackCooldown) return;
 
-            var target = FindNearestEnemy();
-            if (target == null) return;
-
-            float dist = Vector2.Distance(transform.position, target.transform.position);
-            if (dist > Data.attackRange) return;
-
             _attackTimer = 0f;
-            target.ReceiveDamage(Data.baseAttack);
+            _target.ReceiveDamage(Data.baseAttack);
         }
 
-        private UnitController FindNearestEnemy()
+        UnitController FindNearestEnemy()
         {
             UnitController closest = null;
-            float minDist = float.MaxValue;
+            float minDist = searchRadius;
 
             foreach (var unit in FindObjectsOfType<UnitController>())
             {
-                if (unit == this || unit.Owner == Owner || unit.CurrentHP <= 0f)
+                if (unit == this || unit.Owner.id == Owner.id || unit.CurrentHP <= 0f)
                     continue;
 
                 float d = Vector2.Distance(transform.position, unit.transform.position);
@@ -80,15 +111,14 @@ namespace SurvivalChaos
                     closest = unit;
                 }
             }
-
             return closest;
         }
 
-        public void ReceiveDamage(float value)
+        public void ReceiveDamage(float dmg)
         {
-            if (value <= 0f || CurrentHP <= 0f) return;
+            if (dmg <= 0f || CurrentHP <= 0f) return;
 
-            CurrentHP -= value;
+            CurrentHP -= dmg;
             if (CurrentHP <= 0f)
             {
                 CurrentHP = 0f;
@@ -96,13 +126,35 @@ namespace SurvivalChaos
             }
         }
 
+        /* ───── Scene-view debug ───── */
 #if UNITY_EDITOR
-        private void OnDrawGizmosSelected()
+        void OnDrawGizmosSelected()
         {
             if (_data != null)
             {
                 Gizmos.color = Color.red;
                 Gizmos.DrawWireSphere(transform.position, _data.attackRange);
+            }
+
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireSphere(transform.position, searchRadius);
+
+            // ─── Simple health-bar ───
+            if (Application.isPlaying && Data != null)
+            {
+                const float BAR_W = 1.0f, BAR_H = 0.12f, Y_OFF = 0.6f;
+                float hpFrac = Mathf.Clamp01(CurrentHP / Data.baseHP);
+
+                Vector3 barPos = transform.position + Vector3.up * Y_OFF;
+                Vector3 bg = new(BAR_W, BAR_H, 0);
+                Vector3 fg = new(BAR_W * hpFrac, BAR_H, 0);
+                Vector3 fgOffset = Vector3.left * (BAR_W - fg.x) * 0.5f;
+
+                Gizmos.color = Color.black;
+                Gizmos.DrawCube(barPos, bg);
+
+                Gizmos.color = Color.Lerp(Color.red, Color.green, hpFrac);
+                Gizmos.DrawCube(barPos - fgOffset, fg);
             }
         }
 #endif

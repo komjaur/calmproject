@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: a4c7e16c367a9bd449d7b2f56830414b
+guid: 04d6bbe07fe114644970817d4c562277
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8902559945836557894
-    second: hum_t1_melee_footman_0
+      213: -4153268395957102443
+    second: tile_stone_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -72,10 +72,10 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 32
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -126,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: hum_t1_melee_footman_0
+      name: tile_stone_0
       rect:
         serializedVersion: 2
-        x: 7
-        y: 6
-        width: 16
-        height: 19
+        x: 0
+        y: 0
+        width: 8
+        height: 8
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 646753b5a1f3c8b70800000000000000
-      internalID: 8902559945836557894
+      spriteID: 598de1a1660ac56c0800000000000000
+      internalID: -4153268395957102443
       vertices: []
       indices: 
       edges: []
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      hum_t1_melee_footman_0: 8902559945836557894
+      tile_stone_0: -4153268395957102443
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
