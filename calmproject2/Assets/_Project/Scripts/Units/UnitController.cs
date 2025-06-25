@@ -7,6 +7,14 @@ namespace SurvivalChaos
     /// </summary>
     public class UnitController : MonoBehaviour
     {
+        [Header("Editor Configuration")]
+
+        [Tooltip("Assign this unit's owner in the editor for testing.")]
+        [SerializeField] private PlayerInfo _owner;
+
+        [Tooltip("Assign this unit's base data (HP, attack, cooldown, etc.).")]
+        [SerializeField] private UnitData _data;
+
         /// <summary>The player who owns this unit.</summary>
         public PlayerInfo Owner { get; private set; }
 
@@ -18,21 +26,21 @@ namespace SurvivalChaos
 
         private float _attackTimer;
 
-        /// <summary>
-        /// Called by SpawnSystem immediately after the unit prefab is instantiated.
-        /// </summary>
+        private void Awake()
+        {
+            if (_owner != null && _data != null)
+                Init(_owner, _data);
+        }
+
         public void Init(PlayerInfo owner, UnitData data)
         {
             Owner = owner;
-            Data  = data;
+            Data = data;
 
             CurrentHP = data != null ? data.baseHP : 0f;
             _attackTimer = 0f;
 
-            // Example: apply base stats, team colours, etc.
-            //   health = data.baseHP;
-            //   attack = data.baseAttack;
-            //   SetTeamMaterial(owner.teamColour);
+            // Optional: Apply visuals or team material here
         }
 
         private void Update()
@@ -40,13 +48,12 @@ namespace SurvivalChaos
             if (Data == null || CurrentHP <= 0f) return;
 
             _attackTimer += Time.deltaTime;
-
             if (_attackTimer < Data.attackCooldown) return;
 
             var target = FindNearestEnemy();
             if (target == null) return;
 
-            float dist = Vector3.Distance(transform.position, target.transform.position);
+            float dist = Vector2.Distance(transform.position, target.transform.position);
             if (dist > Data.attackRange) return;
 
             _attackTimer = 0f;
@@ -63,7 +70,7 @@ namespace SurvivalChaos
                 if (unit == this || unit.Owner == Owner || unit.CurrentHP <= 0f)
                     continue;
 
-                float d = Vector3.Distance(transform.position, unit.transform.position);
+                float d = Vector2.Distance(transform.position, unit.transform.position);
                 if (d < minDist)
                 {
                     minDist = d;
@@ -74,7 +81,6 @@ namespace SurvivalChaos
             return closest;
         }
 
-        /// <summary>Applies damage to this unit and destroys it if health reaches zero.</summary>
         public void ReceiveDamage(float value)
         {
             if (value <= 0f || CurrentHP <= 0f) return;
@@ -87,6 +93,15 @@ namespace SurvivalChaos
             }
         }
 
-        // Additional behaviour (movement, death rewards, etc.) would go here.
+#if UNITY_EDITOR
+        private void OnDrawGizmosSelected()
+        {
+            if (_data != null)
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawWireSphere(transform.position, _data.attackRange);
+            }
+        }
+#endif
     }
 }
