@@ -80,13 +80,7 @@ public class LobbyDemo : MonoBehaviour
                     profiles.Add(lu.Profile);
             }
 
-            // Register with MatchManager and overlay
-            var manager = FindObjectOfType<MatchManager>();
-            if (manager) manager.StartMatch(match, profiles);
-            var overlay = FindObjectOfType<MatchmakingDebugOverlay>();
-            if (overlay) overlay.MarkMatchAsPlaying(match);
-
-            // TODO: load gameplay scene & hand over match.Players
+            StartCoroutine(BeginMatchCountdown(match, profiles));
         }
     }
 
@@ -121,6 +115,25 @@ public class LobbyDemo : MonoBehaviour
             lu.IsQueued = false;
             Debug.Log($"[Lobby] {profile.Name} un-queued");
         }
+    }
+
+    // ---------------------------------------------------------------- coroutines
+    private const int MATCH_START_DELAY = 5;
+
+    private System.Collections.IEnumerator BeginMatchCountdown(Match match, List<User> profiles)
+    {
+        var overlay = FindObjectOfType<MatchmakingDebugOverlay>();
+        for (int t = MATCH_START_DELAY; t > 0; --t)
+        {
+            if (overlay) overlay.SetCountdown(match, t);
+            yield return new WaitForSeconds(1f);
+        }
+
+        var manager = FindObjectOfType<MatchManager>();
+        if (manager) manager.StartMatch(match, profiles);
+        if (overlay) overlay.MarkMatchAsPlaying(match);
+
+        // TODO: load gameplay scene & hand over match.Players
     }
 }
 

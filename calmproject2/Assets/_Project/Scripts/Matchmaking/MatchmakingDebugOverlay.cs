@@ -11,11 +11,28 @@ using SurvivalChaos;
 
 public class MatchmakingDebugOverlay : MonoBehaviour
 {
+    // matches currently counting down to game start
+    private readonly Dictionary<Match, int> _starting = new();
     // matches that have left the queue and entered actual gameplay
     private readonly List<Match> _playing = new();
 
     // ------------------------------------------------------------------- API
-    public void MarkMatchAsPlaying(Match match) => _playing.Add(match);
+    /// <summary>Sets the remaining countdown time for a soon-to-start match.</summary>
+    public void SetCountdown(Match match, int seconds)
+    {
+        if (match != null)
+            _starting[match] = Mathf.Max(0, seconds);
+    }
+
+    /// <summary>Moves a match from the starting list to actively playing.</summary>
+    public void MarkMatchAsPlaying(Match match)
+    {
+        if (match != null)
+        {
+            _starting.Remove(match);
+            _playing.Add(match);
+        }
+    }
 
     // ------------------------------------------------------------- IMGUI draw
     private const float PAD   = 6f;
@@ -37,6 +54,10 @@ public class MatchmakingDebugOverlay : MonoBehaviour
         DrawSection("MATCHES – CREATING",
                     MatchmakingManager.Instance.ReadyMatchesReadOnly,
                     m => ListNames(m.Players));
+
+        DrawSection("MATCHES – STARTING",
+                    _starting,
+                    kv => $"{ListNames(kv.Key.Players)} (in {kv.Value})");
 
         DrawSection("MATCHES – PLAYING",
                     _playing,

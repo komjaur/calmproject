@@ -41,6 +41,8 @@ classes that implement an Elo-based queue for four-player matches. Every second
 the queue is sorted by rating, and groups whose rating spread falls within the
 smallest tolerance of the waiting players are popped and handed off to
 `GameManager`. Each ticket widens its own tolerance over time so longer-waiting
+Before entering gameplay each ready match counts down for a few seconds so
+players see a brief "starting" state in the debug overlay.
 
 players match more quickly without forcing global settings. When a match starts
 it is tracked by `MatchManager` until completion. Duration is recorded and each
