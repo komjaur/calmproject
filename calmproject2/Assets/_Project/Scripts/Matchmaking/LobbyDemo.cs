@@ -1,112 +1,133 @@
 /*  LobbyDemo.cs
- *  Drag this onto an empty GameObject.
- *  Users configured in the Inspector will auto-connect to the lobby on Play,
- *  press ”Play” (i.e. request a match), and get forwarded to the matchmaker.
+ *  Drop this on an empty GameObject.
+ *  Tick / untick “want To Play” in the Inspector while the game is running
+ *  to add / remove users from the matchmaking queue.
  */
 using System.Collections.Generic;
 using UnityEngine;
-using SurvivalChaos;              // User, PlayerInfo, MatchmakingTicket, Race…
+using SurvivalChaos;   // User, PlayerInfo, MatchmakingTicket, Race …
 
-#region  Inspector-friendly user preset
-[System.Serializable]            // visible in the Inspector
+#region  Inspector-friendly preset -------------------------------------------
+[System.Serializable]
 public class LobbyUserPreset
 {
-    public User  profile;        // persistent data object
-    public Race  preferredRace = Race.Human;
-    public Color color         = Color.white;
-    public int   elo           = 1200;
-    public bool  joinOnStart   = true;      // auto-join when scene starts?
+    public User  profile;                      // persistent data (stats etc.)
+    public Race  preferredRace = Race.Human;   // race pre-selected in lobby
+    public Color color         = Color.white;  // UI / minimap colour
+
+    [Tooltip("If checked the user is queued for a match; "
+           + "untick to pull them out again.")]
+    public bool  wantToPlay    = true;
 }
 #endregion
 
 public class LobbyDemo : MonoBehaviour
 {
-    [Header("Users that will enter the lobby when the scene starts")]
+    // ───────────────────────────────────────────── singleton for debug overlay
+    private static LobbyDemo _instance;
+    public  static IReadOnlyDictionary<int, LobbyUser> ActiveReadOnly
+        => _instance?.active;
+
+    // ───────────────────────────────────────────── inspector list of presets
+    [Header("Users visible in the lobby")]
     [SerializeField] private List<LobbyUserPreset> presets = new();
 
-    // active users in the lobby, keyed by User.Id (or GetHashCode as a fallback)
+    // runtime state – one entry per user profile
     private readonly Dictionary<int, LobbyUser> active = new();
 
-    #region Life-cycle --------------------------------------------------------
+    // ──────────────────────────────────────────────── life-cycle
+    private void Awake()
+    {
+        _instance = this;
+    }
 
     private void Start()
     {
         foreach (LobbyUserPreset p in presets)
         {
-            if (p.joinOnStart && p.profile != null)
-            {
-                AddUserToLobby(p.profile, p.elo, p.preferredRace, p.color);
-                RequestPlay(p.profile);              // auto-press “Play”
-            }
+            if (p.profile == null) continue;
+
+            AddUserToLobby(p);                       // always in the lobby
+            if (p.wantToPlay) SetPlayState(p.profile, true);  // maybe queued
         }
     }
 
     private void Update()
     {
-        // Poll the matchmaker every frame and print when a match pops out
-        while (MatchmakingManager.Instance.TryDequeueReadyMatch(out Match match))
+        // 1) Watch the Inspector toggles and reflect them in the queue
+        foreach (LobbyUserPreset p in presets)
         {
-            Debug.Log($"[Lobby] Match ready with {match.Players.Count} players");
-            // TODO: Load gameplay scene and hand over match.Players
+            if (p.profile == null) continue;
+
+            int key = p.profile.GetHashCode();
+            if (!active.TryGetValue(key, out LobbyUser lu)) continue;
+
+            if (p.wantToPlay && !lu.IsQueued)
+                SetPlayState(p.profile, true);
+            else if (!p.wantToPlay && lu.IsQueued)
+                SetPlayState(p.profile, false);
         }
+
+       while (MatchmakingManager.Instance.TryDequeueReadyMatch(out Match match))
+{
+    Debug.Log($"[Lobby] Match ready with {match.Players.Count} players");
+
+  // Tell the debug overlay that this one is now ‘in play’
+   var overlay = FindObjectOfType<MatchmakingDebugOverlay>();
+   if (overlay) overlay.MarkMatchAsPlaying(match);
+
+    // TODO: load gameplay scene & hand over match.Players
+}
     }
-    #endregion
 
-    #region Public API --------------------------------------------------------
-
-    public void AddUserToLobby(User profile,
-                               int   elo,
-                               Race  race  = Race.Human,
-                               Color color = default)
+    // ───────────────────────────────────────────── internal helpers
+    private void AddUserToLobby(LobbyUserPreset preset)
     {
-        int key = profile.GetHashCode();              // or a stable User.Id
+        int key = preset.profile.GetHashCode();
         if (active.ContainsKey(key)) return;
 
-        active[key] = new LobbyUser(profile, elo, race, color);
-        Debug.Log($"[Lobby] {profile.Name} joined (Elo {elo})");
+        active[key] = new LobbyUser(preset);
+        Debug.Log($"[Lobby] {preset.profile.Name} joined (Elo {preset.profile.Elo})");
     }
 
-    public void RemoveUserFromLobby(User profile)
+    /// Toggle whether the given user is in the matchmaking queue.
+    private void SetPlayState(User profile, bool wantsToPlay)
     {
         int key = profile.GetHashCode();
-        if (!active.Remove(key)) return;
+        if (!active.TryGetValue(key, out LobbyUser lu)) return;
 
-        Debug.Log($"[Lobby] {profile.Name} left the lobby");
+        if (wantsToPlay)
+        {
+            // build PlayerInfo → ticket → enqueue
+            PlayerInfo player = new PlayerInfo(key, lu.SelectedRace, lu.Color);
+            var ticket        = new MatchmakingTicket(player, lu.Profile.Elo);
+            MatchmakingManager.Instance.Enqueue(ticket);
+            lu.IsQueued = true;
+            Debug.Log($"[Lobby] {profile.Name} queued (Elo {lu.Profile.Elo})");
+        }
+        else
+        {
+            MatchmakingManager.Instance.RemoveFromQueue(key);
+            lu.IsQueued = false;
+            Debug.Log($"[Lobby] {profile.Name} un-queued");
+        }
     }
-
-    /// Called when the UI “Play” button is pressed.
-    public void RequestPlay(User profile)
-    {
-        int key = profile.GetHashCode();
-        if (!active.TryGetValue(key, out LobbyUser u)) return;
-
-        // Convert to the runtime‐only PlayerInfo used inside the game
-        PlayerInfo player = new PlayerInfo(profile.GetHashCode(),
-                                           u.SelectedRace,
-                                           u.Color);
-
-        // Bind the long-lived User ↔ runtime Player via the same id/hash
-        MatchmakingTicket ticket = new MatchmakingTicket(player, u.Elo);
-        MatchmakingManager.Instance.Enqueue(ticket);
-
-        Debug.Log($"[Lobby] {profile.Name} queued for a game (Elo {u.Elo})");
-    }
-    #endregion
 }
 
-/// <summary>A lightweight wrapper that lives only while the user sits in the lobby.</summary>
+/// <summary>Light-weight runtime wrapper for a user sitting in the lobby.</summary>
 public sealed class LobbyUser
 {
-    public User  Profile       { get; }
-    public int   Elo           { get; }
-    public Race  SelectedRace  { get; set; }
-    public Color Color         { get; set; }
+    public User  Profile      { get; }
 
-    public LobbyUser(User profile, int elo, Race race, Color color)
+    public Race  SelectedRace { get; set; }
+    public Color Color        { get; set; }
+    public bool  IsQueued     { get; set; }
+
+    public LobbyUser(LobbyUserPreset p)
     {
-        Profile      = profile;
-        Elo          = elo;
-        SelectedRace = race;
-        Color        = color;
+        Profile      = p.profile;
+        SelectedRace = p.preferredRace;
+        Color        = p.color;
     }
 }
+

@@ -694,6 +694,223 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1385205950}
   m_CullTransparentMesh: 1
+--- !u!1 &2044266874
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2044266876}
+  - component: {fileID: 2044266875}
+  - component: {fileID: 2044266878}
+  - component: {fileID: 2044266877}
+  - component: {fileID: 2044266879}
+  - component: {fileID: 2044266880}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2044266875
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2044266874}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 999957be37049dd4388c744b75fa718d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  players:
+  - id: 0
+    race: 0
+    color:
+      r: 0.90588236
+      g: 0.29803923
+      b: 0.23529412
+      a: 1
+    elo: 1200
+  - id: 1
+    race: 1
+    color:
+      r: 0.16078432
+      g: 0.5019608
+      b: 0.7254902
+      a: 1
+    elo: 1180
+  - id: 2
+    race: 1
+    color:
+      r: 0.18039216
+      g: 0.8
+      b: 0.44313726
+      a: 1
+    elo: 1230
+  - id: 3
+    race: 2
+    color:
+      r: 0.94509804
+      g: 0.76862746
+      b: 0.05882353
+      a: 1
+    elo: 1215
+  - id: 4
+    race: 2
+    color:
+      r: 0.94509804
+      g: 0.76862746
+      b: 0.05882353
+      a: 1
+    elo: 1215
+  - id: 5
+    race: 2
+    color:
+      r: 0.94509804
+      g: 0.76862746
+      b: 0.05882353
+      a: 1
+    elo: 1215
+  - id: 6
+    race: 2
+    color:
+      r: 0.94509804
+      g: 0.76862746
+      b: 0.05882353
+      a: 1
+    elo: 1215
+  - id: 7
+    race: 2
+    color:
+      r: 0.94509804
+      g: 0.76862746
+      b: 0.05882353
+      a: 1
+    elo: 1215
+--- !u!4 &2044266876
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2044266874}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.0220912, y: -1.2105571, z: -0.16402714}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2044266877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2044266874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7eec601561642f99a8275e4d3fa48e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2044266878
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2044266874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 428a5bd8667363d4cbc19de2696d9949, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2044266879
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2044266874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0b997ddd98653c4f96cd9c426b33b4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  presets:
+  - profile:
+      Name: test1
+      Rank: 0
+      TotalWins: 0
+      TotalPlaytime: 0
+      AveragePlaytimePerMatch: 0
+      Gold: 0
+      Crystal: 0
+    preferredRace: 0
+    color: {r: 0, g: 0, b: 0, a: 0}
+    wantToPlay: 1
+  - profile:
+      Name: superman
+      Rank: 0
+      TotalWins: 0
+      TotalPlaytime: 0
+      AveragePlaytimePerMatch: 0
+      Gold: 0
+      Crystal: 0
+    preferredRace: 0
+    color: {r: 0, g: 0, b: 0, a: 0}
+    wantToPlay: 1
+  - profile:
+      Name: 
+      Rank: 0
+      TotalWins: 0
+      TotalPlaytime: 0
+      AveragePlaytimePerMatch: 0
+      Gold: 0
+      Crystal: 0
+    preferredRace: 0
+    color: {r: 0, g: 0, b: 0, a: 0}
+    wantToPlay: 1
+  - profile:
+      Name: 
+      Rank: 0
+      TotalWins: 0
+      TotalPlaytime: 0
+      AveragePlaytimePerMatch: 0
+      Gold: 0
+      Crystal: 0
+    preferredRace: 0
+    color: {r: 0, g: 0, b: 0, a: 0}
+    wantToPlay: 1
+  - profile:
+      Name: 
+      Rank: 0
+      TotalWins: 0
+      TotalPlaytime: 0
+      AveragePlaytimePerMatch: 0
+      Gold: 0
+      Crystal: 0
+    preferredRace: 0
+    color: {r: 0, g: 0, b: 0, a: 0}
+    wantToPlay: 1
+--- !u!114 &2044266880
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2044266874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2e10c67b2174f64fb2f81a409d62d92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -701,3 +918,4 @@ SceneRoots:
   - {fileID: 259088779}
   - {fileID: 351112234}
   - {fileID: 554730439}
+  - {fileID: 2044266876}

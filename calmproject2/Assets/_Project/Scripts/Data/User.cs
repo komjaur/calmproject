@@ -19,7 +19,7 @@ namespace SurvivalChaos
         public int Gold;        // Earned through gameplay
         public int Crystal;     // Premium currency purchased with real money
 
-
+        public int Elo;
         // Extended gameplay analytics
         public int TotalUnitsProduced { get; private set; }
         public int TotalUnitsLost { get; private set; }
@@ -84,7 +84,7 @@ namespace SurvivalChaos
             AveragePlaytimePerMatch = 0f;
             Gold = 0;
             Crystal = 0;
-
+            Elo = 1200; // Default Elo rating
             TotalGoldAcquired = 0;
             TotalCrystalAcquired = 0;
             TotalMatches = 0;
@@ -99,9 +99,9 @@ namespace SurvivalChaos
             ShortestMatchDuration = float.MaxValue;
 
             TotalMatches = 0;
-
+            
         }
-
+        public void ApplyNewElo(int newElo) => Elo = newElo;
         /// <summary>
         /// Records the result of a single match and updates aggregates.
         /// </summary>

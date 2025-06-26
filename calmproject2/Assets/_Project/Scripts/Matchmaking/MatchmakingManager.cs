@@ -1,104 +1,64 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace SurvivalChaos
 {
-    /// <summary>
-    /// Central hub that turns queued MatchmakingTickets into 4-player Matches.
-    /// Attach it to a GameObject (or make it DontDestroyOnLoad).
-    /// </summary>
+    
+    /// Turns MatchmakingTickets into ready 4-player Matches.
     public class MatchmakingManager : MonoBehaviour
     {
-        // Singleton shortcut --------------------------------------------------
         public static MatchmakingManager Instance { get; private set; }
+// Read-only access for debug overlays or UI
+public IReadOnlyList<MatchmakingTicket> QueueReadOnly      => _queue;
+public IReadOnlyCollection<Match>       ReadyMatchesReadOnly => _readyMatches;
 
-        [Tooltip("How player races are chosen when a match forms.")]
-        public MatchType matchType = MatchType.Normal;
+        private const int PLAYERS_PER_MATCH = 4;
+        private const int START_TOLERANCE = 50;  // ±Elo
+        private const int TOLERANCE_STEP = 25;  // widens per scan
+        private const float CHECK_INTERVAL = 1.0f;
 
-        // Tunables ------------------------------------------------------------
-        private const int   PLAYERS_PER_MATCH   = 4;
+        private readonly List<MatchmakingTicket> _queue = new();
+        private readonly Queue<Match> _readyMatches = new();
 
-        private const int   START_ELO_TOLERANCE = 50;   // initial ±Elo window
-        private const int   TOLERANCE_STEP      = 25;   // widens after each scan
-        private const float CHECK_INTERVAL      = 1.0f; // seconds between scans
+        private int _tolerance = START_TOLERANCE;
+        private float _nextScan = 0f;
 
-        // Internal state ------------------------------------------------------
-        private int  _currentTolerance  = START_ELO_TOLERANCE;
-        private float _nextScanTime     = 0f;
-
-        private readonly List<MatchmakingTicket> _queue       = new(); // waiting players
-        private readonly Queue<Match>            _readyMatches = new(); // finished groups
-
-        #region Unity lifecycle
         private void Awake()
         {
-            if (Instance == null)
-                Instance = this;
-            else
-                Destroy(gameObject);
+            if (Instance == null) Instance = this;
+            else Destroy(gameObject);
         }
 
         private void Update()
         {
-            if (Time.time < _nextScanTime || _queue.Count < PLAYERS_PER_MATCH)
-                return;
+            if (Time.time < _nextScan || _queue.Count < PLAYERS_PER_MATCH) return;
+            _nextScan = Time.time + CHECK_INTERVAL;
 
-            _nextScanTime = Time.time + CHECK_INTERVAL;
-
-            // 1) Sort once so Elo values are ascending – grouping gets cheaper
             _queue.Sort((a, b) => a.Elo.CompareTo(b.Elo));
 
-            // 2) Slide a window and pull out any tight 4-player clusters
-            for (int i = 0; i + PLAYERS_PER_MATCH - 1 < _queue.Count; )
+            for (int i = 0; i + PLAYERS_PER_MATCH - 1 < _queue.Count;)
             {
-                int minElo = _queue[i].Elo;
-                int maxElo = _queue[i + PLAYERS_PER_MATCH - 1].Elo;
+                int min = _queue[i].Elo;
+                int max = _queue[i + PLAYERS_PER_MATCH - 1].Elo;
 
-                if (maxElo - minElo <= _currentTolerance)
+                if (max - min <= _tolerance)
                 {
-                    // Build a Match
-                    List<PlayerInfo> players = new(PLAYERS_PER_MATCH);
-                    Array races = Enum.GetValues(typeof(Race));
+                    var players = new List<PlayerInfo>(PLAYERS_PER_MATCH);
                     for (int p = 0; p < PLAYERS_PER_MATCH; ++p)
-                    {
-                        PlayerInfo original = _queue[i + p].Player;
-                        Race race = original.race;
-                        if (matchType == MatchType.Chaos)
-                        {
-                            int idx = UnityEngine.Random.Range(0, races.Length);
-                            race = (Race)races.GetValue(idx);
-                        }
-                        players.Add(new PlayerInfo(original.id, race, original.color));
-                    }
+                        players.Add(_queue[i + p].Player);
 
-                    // Remove tickets from queue
                     _queue.RemoveRange(i, PLAYERS_PER_MATCH);
-
-                    // Enqueue ready match
                     _readyMatches.Enqueue(new Match(players));
-
-                    // stay at same index i – list shrank, new ticket now sits here
                 }
                 else
-                {
-                    ++i; // window too wide – shift right
-                }
+                    ++i;
             }
-
-            // 3) Make matching progressively easier the longer players wait
-            _currentTolerance += TOLERANCE_STEP;
-        }
-        #endregion
-
-        #region Public API -----------------------------------------------------
-        /// <summary>Adds a player ticket to the queue.</summary>
-        public void Enqueue(MatchmakingTicket ticket)
-        {
-            _queue.Add(ticket);
+            _tolerance += TOLERANCE_STEP;
         }
 
-        /// <summary>Called by the lobby/menu: is a 4-player match ready?</summary>
+        // --------------------------- Public API -----------------------------
+        public void Enqueue(MatchmakingTicket t) => _queue.Add(t);
+
         public bool TryDequeueReadyMatch(out Match match)
         {
             if (_readyMatches.Count > 0)
@@ -106,10 +66,14 @@ namespace SurvivalChaos
                 match = _readyMatches.Dequeue();
                 return true;
             }
-
             match = null;
             return false;
         }
-        #endregion
+
+        /// <summary>Remove a player (by id/hash) from the waiting queue.</summary>
+        public void RemoveFromQueue(int playerId)
+        {
+            _queue.RemoveAll(t => t.Player.id == playerId);
+        }
     }
 }
