@@ -41,9 +41,14 @@ namespace SurvivalChaos
         public float WinRate => TotalMatches > 0 ? (float)TotalWins / TotalMatches : 0f;
         public float AverageGoldPerMatch => TotalMatches > 0 ? (float)TotalGoldAcquired / TotalMatches : 0f;
 
-        // Track how often each race has been played
+        // Track how often each race has been played and the outcome stats
         private readonly Dictionary<string, int> _racesPlayed = new Dictionary<string, int>();
+        private readonly Dictionary<string, int> _raceWins = new Dictionary<string, int>();
+        private readonly Dictionary<string, int> _raceLosses = new Dictionary<string, int>();
+
         public IReadOnlyDictionary<string, int> RacesPlayed => _racesPlayed;
+        public IReadOnlyDictionary<string, int> RaceWins => _raceWins;
+        public IReadOnlyDictionary<string, int> RaceLosses => _raceLosses;
 
         /// <summary>
         /// The race with the highest play count or null if none recorded.
@@ -129,6 +134,12 @@ namespace SurvivalChaos
                     _racesPlayed[race]++;
                 else
                     _racesPlayed[race] = 1;
+
+                var targetDict = won ? _raceWins : _raceLosses;
+                if (targetDict.ContainsKey(race))
+                    targetDict[race]++;
+                else
+                    targetDict[race] = 1;
             }
 
         }
