@@ -68,16 +68,26 @@ public class LobbyDemo : MonoBehaviour
                 SetPlayState(p.profile, false);
         }
 
-       while (MatchmakingManager.Instance.TryDequeueReadyMatch(out Match match))
-{
-    Debug.Log($"[Lobby] Match ready with {match.Players.Count} players");
+        while (MatchmakingManager.Instance.TryDequeueReadyMatch(out Match match))
+        {
+            Debug.Log($"[Lobby] Match ready with {match.Players.Count} players");
 
-  // Tell the debug overlay that this one is now ‘in play’
-   var overlay = FindObjectOfType<MatchmakingDebugOverlay>();
-   if (overlay) overlay.MarkMatchAsPlaying(match);
+            // Build profile list for MatchManager
+            var profiles = new List<User>(match.Players.Count);
+            foreach (var pInfo in match.Players)
+            {
+                if (active.TryGetValue(pInfo.id, out LobbyUser lu))
+                    profiles.Add(lu.Profile);
+            }
 
-    // TODO: load gameplay scene & hand over match.Players
-}
+            // Register with MatchManager and overlay
+            var manager = FindObjectOfType<MatchManager>();
+            if (manager) manager.StartMatch(match, profiles);
+            var overlay = FindObjectOfType<MatchmakingDebugOverlay>();
+            if (overlay) overlay.MarkMatchAsPlaying(match);
+
+            // TODO: load gameplay scene & hand over match.Players
+        }
     }
 
     // ───────────────────────────────────────────── internal helpers

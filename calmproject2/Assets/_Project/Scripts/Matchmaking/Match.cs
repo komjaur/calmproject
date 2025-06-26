@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace SurvivalChaos
@@ -21,9 +22,29 @@ namespace SurvivalChaos
     {
         public IReadOnlyList<PlayerInfo> Players { get; }
 
+        public DateTime StartedAt { get; private set; }
+        public DateTime? EndedAt { get; private set; }
+
+        public float DurationSeconds
+            => (float)((EndedAt ?? DateTime.UtcNow) - StartedAt).TotalSeconds;
+
         public Match(List<PlayerInfo> players)
         {
             Players = players;
+        }
+
+        /// <summary>Marks the match as started.</summary>
+        public void Start()
+        {
+            StartedAt = DateTime.UtcNow;
+            EndedAt = null;
+        }
+
+        /// <summary>Marks the match as finished.</summary>
+        public void Finish()
+        {
+            if (EndedAt == null)
+                EndedAt = DateTime.UtcNow;
         }
     }
 }
