@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,6 +12,9 @@ namespace SurvivalChaos
     {
         // Singleton shortcut --------------------------------------------------
         public static MatchmakingManager Instance { get; private set; }
+
+        [Tooltip("How player races are chosen when a match forms.")]
+        public MatchType matchType = MatchType.Normal;
 
         // Tunables ------------------------------------------------------------
         private const int   PLAYERS_PER_MATCH   = 4;
@@ -55,8 +59,18 @@ namespace SurvivalChaos
                 {
                     // Build a Match
                     List<PlayerInfo> players = new(PLAYERS_PER_MATCH);
+                    Array races = Enum.GetValues(typeof(Race));
                     for (int p = 0; p < PLAYERS_PER_MATCH; ++p)
-                        players.Add(_queue[i + p].Player);
+                    {
+                        PlayerInfo original = _queue[i + p].Player;
+                        Race race = original.race;
+                        if (matchType == MatchType.Chaos)
+                        {
+                            int idx = UnityEngine.Random.Range(0, races.Length);
+                            race = (Race)races.GetValue(idx);
+                        }
+                        players.Add(new PlayerInfo(original.id, race, original.color));
+                    }
 
                     // Remove tickets from queue
                     _queue.RemoveRange(i, PLAYERS_PER_MATCH);

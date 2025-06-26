@@ -41,6 +41,10 @@ classes that implement an Elo-based queue for four-player matches. Every second
 the queue is sorted by rating, and groups whose rating spread falls within each
 player's growing tolerance are popped and handed off to `GameManager`.
 
+Matchmaking supports two **match types**:
+ - **Normal** – each player keeps their chosen race.
+ - **Chaos** – races are randomly assigned when the match forms.
+
 
 ### Player Profiles & Statistics
 
