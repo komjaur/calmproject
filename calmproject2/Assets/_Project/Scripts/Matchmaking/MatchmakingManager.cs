@@ -1,86 +1,101 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace SurvivalChaos
 {
     /// <summary>
-    /// Very simple Elo-based matchmaking for 4-player matches.
+    /// Central hub that turns queued MatchmakingTickets into 4-player Matches.
+    /// Attach it to a GameObject (or make it DontDestroyOnLoad).
     /// </summary>
     public class MatchmakingManager : MonoBehaviour
     {
+        // Singleton shortcut --------------------------------------------------
         public static MatchmakingManager Instance { get; private set; }
 
-        private readonly List<MatchmakingTicket> queue = new();
+        // Tunables ------------------------------------------------------------
+        private const int   PLAYERS_PER_MATCH   = 4;
 
+        private const int   START_ELO_TOLERANCE = 50;   // initial ±Elo window
+        private const int   TOLERANCE_STEP      = 25;   // widens after each scan
+        private const float CHECK_INTERVAL      = 1.0f; // seconds between scans
+
+        // Internal state ------------------------------------------------------
+        private int  _currentTolerance  = START_ELO_TOLERANCE;
+        private float _nextScanTime     = 0f;
+
+        private readonly List<MatchmakingTicket> _queue       = new(); // waiting players
+        private readonly Queue<Match>            _readyMatches = new(); // finished groups
+
+        #region Unity lifecycle
         private void Awake()
         {
-            if (Instance != null && Instance != this)
-            {
+            if (Instance == null)
+                Instance = this;
+            else
                 Destroy(gameObject);
-                return;
-            }
-
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
 
-        private void OnEnable()
+        private void Update()
         {
-            StartCoroutine(ProcessLoop());
-        }
-
-        /// <summary>
-        /// Adds a ticket to the matchmaking queue.
-        /// </summary>
-        public void Enqueue(MatchmakingTicket ticket)
-        {
-            if (ticket != null)
-                queue.Add(ticket);
-        }
-
-        private IEnumerator ProcessLoop()
-        {
-            var wait = new WaitForSeconds(1f);
-            while (true)
-            {
-                yield return wait;
-                ProcessQueue();
-            }
-        }
-
-        private void ProcessQueue()
-        {
-            if (queue.Count < 4)
+            if (Time.time < _nextScanTime || _queue.Count < PLAYERS_PER_MATCH)
                 return;
 
-            queue.Sort((a, b) => a.Elo.CompareTo(b.Elo));
+            _nextScanTime = Time.time + CHECK_INTERVAL;
 
-            for (int i = 0; i <= queue.Count - 4;)
+            // 1) Sort once so Elo values are ascending – grouping gets cheaper
+            _queue.Sort((a, b) => a.Elo.CompareTo(b.Elo));
+
+            // 2) Slide a window and pull out any tight 4-player clusters
+            for (int i = 0; i + PLAYERS_PER_MATCH - 1 < _queue.Count; )
             {
-                var block = queue.GetRange(i, 4);
-                int maxElo = block.Max(t => t.Elo);
-                int minElo = block.Min(t => t.Elo);
-                int diff = maxElo - minElo;
+                int minElo = _queue[i].Elo;
+                int maxElo = _queue[i + PLAYERS_PER_MATCH - 1].Elo;
 
-                bool allReady = block.All(t => t.CurrentTolerance >= diff);
-                if (allReady)
+                if (maxElo - minElo <= _currentTolerance)
                 {
-                    queue.RemoveRange(i, 4);
-                    StartMatch(block);
+                    // Build a Match
+                    List<PlayerInfo> players = new(PLAYERS_PER_MATCH);
+                    for (int p = 0; p < PLAYERS_PER_MATCH; ++p)
+                        players.Add(_queue[i + p].Player);
+
+                    // Remove tickets from queue
+                    _queue.RemoveRange(i, PLAYERS_PER_MATCH);
+
+                    // Enqueue ready match
+                    _readyMatches.Enqueue(new Match(players));
+
+                    // stay at same index i – list shrank, new ticket now sits here
                 }
                 else
                 {
-                    i++;
+                    ++i; // window too wide – shift right
                 }
             }
+
+            // 3) Make matching progressively easier the longer players wait
+            _currentTolerance += TOLERANCE_STEP;
+        }
+        #endregion
+
+        #region Public API -----------------------------------------------------
+        /// <summary>Adds a player ticket to the queue.</summary>
+        public void Enqueue(MatchmakingTicket ticket)
+        {
+            _queue.Add(ticket);
         }
 
-        private void StartMatch(List<MatchmakingTicket> tickets)
+        /// <summary>Called by the lobby/menu: is a 4-player match ready?</summary>
+        public bool TryDequeueReadyMatch(out Match match)
         {
-            List<PlayerInfo> players = tickets.Select(t => t.Player).ToList();
-            GameManager.Instance.StartGame(players);
+            if (_readyMatches.Count > 0)
+            {
+                match = _readyMatches.Dequeue();
+                return true;
+            }
+
+            match = null;
+            return false;
         }
+        #endregion
     }
 }

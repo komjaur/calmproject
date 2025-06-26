@@ -31,6 +31,8 @@ namespace SurvivalChaos
         {
             ActivePlayers = players ?? new List<PlayerInfo>();
             State = GameState.Running;
+            Debug.Log("Game Started");
+            Debug.Log(ActivePlayers);
         }
 
    

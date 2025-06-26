@@ -67,7 +67,7 @@ namespace SurvivalChaos
         }
 
 
-        public int TotalMatches { get; private set; }
+   
 
 
         public User(string name)
