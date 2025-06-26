@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace SurvivalChaos
 {
@@ -16,7 +17,36 @@ namespace SurvivalChaos
         public int Gold;        // Earned through gameplay
         public int Crystal;     // Premium currency purchased with real money
 
+        // Running totals for analytics
+        public int TotalGoldAcquired { get; private set; }
+        public int TotalCrystalAcquired { get; private set; }
+
         public int TotalMatches { get; private set; }
+
+        // Track how often each race has been played
+        private readonly Dictionary<string, int> _racesPlayed = new Dictionary<string, int>();
+        public IReadOnlyDictionary<string, int> RacesPlayed => _racesPlayed;
+
+        /// <summary>
+        /// The race with the highest play count or null if none recorded.
+        /// </summary>
+        public string MostPlayedRace
+        {
+            get
+            {
+                string topRace = null;
+                int max = 0;
+                foreach (var pair in _racesPlayed)
+                {
+                    if (pair.Value > max)
+                    {
+                        topRace = pair.Key;
+                        max = pair.Value;
+                    }
+                }
+                return topRace;
+            }
+        }
 
         public User(string name)
         {
@@ -27,6 +57,8 @@ namespace SurvivalChaos
             AveragePlaytimePerMatch = 0f;
             Gold = 0;
             Crystal = 0;
+            TotalGoldAcquired = 0;
+            TotalCrystalAcquired = 0;
             TotalMatches = 0;
         }
 
@@ -36,7 +68,8 @@ namespace SurvivalChaos
         /// <param name="won">Whether the player won the match.</param>
         /// <param name="durationSeconds">Length of the match in seconds.</param>
         /// <param name="goldEarned">Gold earned from the match.</param>
-        public void RecordMatch(bool won, float durationSeconds, int goldEarned)
+        /// <param name="race">Name of the race played.</param>
+        public void RecordMatch(bool won, float durationSeconds, int goldEarned, string race)
         {
             TotalMatches++;
             if (won)
@@ -45,6 +78,15 @@ namespace SurvivalChaos
             TotalPlaytime += durationSeconds;
             AveragePlaytimePerMatch = TotalPlaytime / TotalMatches;
             Gold += goldEarned;
+            TotalGoldAcquired += goldEarned;
+
+            if (!string.IsNullOrEmpty(race))
+            {
+                if (_racesPlayed.ContainsKey(race))
+                    _racesPlayed[race]++;
+                else
+                    _racesPlayed[race] = 1;
+            }
         }
 
         /// <summary>
@@ -53,7 +95,10 @@ namespace SurvivalChaos
         public void AddCrystal(int amount)
         {
             if (amount > 0)
+            {
                 Crystal += amount;
+                TotalCrystalAcquired += amount;
+            }
         }
     }
 }
