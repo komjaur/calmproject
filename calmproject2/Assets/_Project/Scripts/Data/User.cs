@@ -1,5 +1,7 @@
 using System;
+
 using System.Collections.Generic;
+
 
 namespace SurvivalChaos
 {
@@ -16,6 +18,7 @@ namespace SurvivalChaos
         public float AveragePlaytimePerMatch;   // Seconds
         public int Gold;        // Earned through gameplay
         public int Crystal;     // Premium currency purchased with real money
+
 
         // Extended gameplay analytics
         public int TotalUnitsProduced { get; private set; }
@@ -63,6 +66,10 @@ namespace SurvivalChaos
             }
         }
 
+
+        public int TotalMatches { get; private set; }
+
+
         public User(string name)
         {
             Name = name;
@@ -72,6 +79,7 @@ namespace SurvivalChaos
             AveragePlaytimePerMatch = 0f;
             Gold = 0;
             Crystal = 0;
+
             TotalGoldAcquired = 0;
             TotalCrystalAcquired = 0;
             TotalMatches = 0;
@@ -84,6 +92,9 @@ namespace SurvivalChaos
             TotalGoldSpent = 0;
             LongestMatchDuration = 0f;
             ShortestMatchDuration = float.MaxValue;
+
+            TotalMatches = 0;
+
         }
 
         /// <summary>
@@ -92,8 +103,10 @@ namespace SurvivalChaos
         /// <param name="won">Whether the player won the match.</param>
         /// <param name="durationSeconds">Length of the match in seconds.</param>
         /// <param name="goldEarned">Gold earned from the match.</param>
+
         /// <param name="race">Name of the race played.</param>
         public void RecordMatch(bool won, float durationSeconds, int goldEarned, string race)
+
         {
             TotalMatches++;
             if (won)
@@ -102,6 +115,7 @@ namespace SurvivalChaos
             TotalPlaytime += durationSeconds;
             AveragePlaytimePerMatch = TotalPlaytime / TotalMatches;
             Gold += goldEarned;
+
             TotalGoldAcquired += goldEarned;
 
             if (durationSeconds > LongestMatchDuration)
@@ -116,6 +130,7 @@ namespace SurvivalChaos
                 else
                     _racesPlayed[race] = 1;
             }
+
         }
 
         /// <summary>
@@ -124,6 +139,7 @@ namespace SurvivalChaos
         public void AddCrystal(int amount)
         {
             if (amount > 0)
+
             {
                 Crystal += amount;
                 TotalCrystalAcquired += amount;
@@ -183,6 +199,9 @@ namespace SurvivalChaos
                 if (Gold >= amount)
                     Gold -= amount;
             }
+
+                Crystal += amount;
+
         }
     }
 }
