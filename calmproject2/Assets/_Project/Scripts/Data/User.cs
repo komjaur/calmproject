@@ -1,5 +1,8 @@
 using System;
 
+using System.Collections.Generic;
+
+
 namespace SurvivalChaos
 {
     /// <summary>
@@ -16,7 +19,56 @@ namespace SurvivalChaos
         public int Gold;        // Earned through gameplay
         public int Crystal;     // Premium currency purchased with real money
 
+
+        // Extended gameplay analytics
+        public int TotalUnitsProduced { get; private set; }
+        public int TotalUnitsLost { get; private set; }
+        public int TotalUnitsKilled { get; private set; }
+        public float TotalDamageDealt { get; private set; }
+        public float TotalDamageReceived { get; private set; }
+        public int TotalGoldSpent { get; private set; }
+
+        public float LongestMatchDuration { get; private set; }
+        public float ShortestMatchDuration { get; private set; } = float.MaxValue;
+
+        // Running totals for analytics
+        public int TotalGoldAcquired { get; private set; }
+        public int TotalCrystalAcquired { get; private set; }
+
         public int TotalMatches { get; private set; }
+
+        public int TotalLosses => TotalMatches - TotalWins;
+        public float WinRate => TotalMatches > 0 ? (float)TotalWins / TotalMatches : 0f;
+        public float AverageGoldPerMatch => TotalMatches > 0 ? (float)TotalGoldAcquired / TotalMatches : 0f;
+
+        // Track how often each race has been played
+        private readonly Dictionary<string, int> _racesPlayed = new Dictionary<string, int>();
+        public IReadOnlyDictionary<string, int> RacesPlayed => _racesPlayed;
+
+        /// <summary>
+        /// The race with the highest play count or null if none recorded.
+        /// </summary>
+        public string MostPlayedRace
+        {
+            get
+            {
+                string topRace = null;
+                int max = 0;
+                foreach (var pair in _racesPlayed)
+                {
+                    if (pair.Value > max)
+                    {
+                        topRace = pair.Key;
+                        max = pair.Value;
+                    }
+                }
+                return topRace;
+            }
+        }
+
+
+        public int TotalMatches { get; private set; }
+
 
         public User(string name)
         {
@@ -27,7 +79,22 @@ namespace SurvivalChaos
             AveragePlaytimePerMatch = 0f;
             Gold = 0;
             Crystal = 0;
+
+            TotalGoldAcquired = 0;
+            TotalCrystalAcquired = 0;
             TotalMatches = 0;
+
+            TotalUnitsProduced = 0;
+            TotalUnitsLost = 0;
+            TotalUnitsKilled = 0;
+            TotalDamageDealt = 0f;
+            TotalDamageReceived = 0f;
+            TotalGoldSpent = 0;
+            LongestMatchDuration = 0f;
+            ShortestMatchDuration = float.MaxValue;
+
+            TotalMatches = 0;
+
         }
 
         /// <summary>
@@ -36,7 +103,10 @@ namespace SurvivalChaos
         /// <param name="won">Whether the player won the match.</param>
         /// <param name="durationSeconds">Length of the match in seconds.</param>
         /// <param name="goldEarned">Gold earned from the match.</param>
-        public void RecordMatch(bool won, float durationSeconds, int goldEarned)
+
+        /// <param name="race">Name of the race played.</param>
+        public void RecordMatch(bool won, float durationSeconds, int goldEarned, string race)
+
         {
             TotalMatches++;
             if (won)
@@ -45,6 +115,22 @@ namespace SurvivalChaos
             TotalPlaytime += durationSeconds;
             AveragePlaytimePerMatch = TotalPlaytime / TotalMatches;
             Gold += goldEarned;
+
+            TotalGoldAcquired += goldEarned;
+
+            if (durationSeconds > LongestMatchDuration)
+                LongestMatchDuration = durationSeconds;
+            if (durationSeconds < ShortestMatchDuration)
+                ShortestMatchDuration = durationSeconds;
+
+            if (!string.IsNullOrEmpty(race))
+            {
+                if (_racesPlayed.ContainsKey(race))
+                    _racesPlayed[race]++;
+                else
+                    _racesPlayed[race] = 1;
+            }
+
         }
 
         /// <summary>
@@ -53,7 +139,69 @@ namespace SurvivalChaos
         public void AddCrystal(int amount)
         {
             if (amount > 0)
+
+            {
                 Crystal += amount;
+                TotalCrystalAcquired += amount;
+            }
+        }
+
+        /// <summary>
+        /// Tracks when the player spawns a unit.
+        /// </summary>
+        public void RecordUnitProduced()
+        {
+            TotalUnitsProduced++;
+        }
+
+        /// <summary>
+        /// Tracks a killed enemy unit.
+        /// </summary>
+        public void RecordUnitKill()
+        {
+            TotalUnitsKilled++;
+        }
+
+        /// <summary>
+        /// Tracks loss of one of the player's units.
+        /// </summary>
+        public void RecordUnitLost()
+        {
+            TotalUnitsLost++;
+        }
+
+        /// <summary>
+        /// Adds damage dealt by the player.
+        /// </summary>
+        public void AddDamageDealt(float amount)
+        {
+            if (amount > 0f)
+                TotalDamageDealt += amount;
+        }
+
+        /// <summary>
+        /// Adds damage received by the player.
+        /// </summary>
+        public void AddDamageReceived(float amount)
+        {
+            if (amount > 0f)
+                TotalDamageReceived += amount;
+        }
+
+        /// <summary>
+        /// Records gold spent on upgrades or purchases.
+        /// </summary>
+        public void RecordGoldSpent(int amount)
+        {
+            if (amount > 0)
+            {
+                TotalGoldSpent += amount;
+                if (Gold >= amount)
+                    Gold -= amount;
+            }
+
+                Crystal += amount;
+
         }
     }
 }

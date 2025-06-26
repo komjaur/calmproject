@@ -41,6 +41,16 @@ classes that implement an Elo-based queue for four-player matches. Every second
 the queue is sorted by rating, and groups whose rating spread falls within each
 player's growing tolerance are popped and handed off to `GameManager`.
 
+
+### Player Profiles & Statistics
+
+Persistent data for each player lives in the `User` class. It exposes methods
+to record match results, units produced or destroyed, gold spending and more.
+The class keeps running totals of gold and crystal earned, calculates win rate,
+tracks which races a player uses most often and stores damage or unit-count
+metrics for richer post-game analytics.
+
+
 ---
 
 ## Getting Started
