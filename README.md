@@ -41,7 +41,14 @@ classes that implement an Elo-based queue for four-player matches. Every second
 the queue is sorted by rating, and groups whose rating spread falls within the
 smallest tolerance of the waiting players are popped and handed off to
 `GameManager`. Each ticket widens its own tolerance over time so longer-waiting
+
+players match more quickly without forcing global settings. When a match starts
+it is tracked by `MatchManager` until completion. Duration is recorded and each
+player's `User` profile is updated before the result is logged to the in-memory
+`GameDatabase`.
+=======
 players match more quickly without forcing global settings.
+
 
 Matchmaking supports two **match types**:
  - **Normal** – each player keeps their chosen race.
