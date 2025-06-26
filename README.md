@@ -1,7 +1,6 @@
 # Survival Chaos Unity Starter
 
-This repository contains a bare-bones Unity project structure intended to recreate the core loop of *Survival Chaos*.  
-The project lives in **calmproject2/** and targets **Unity 2022.3 LTS** with the Universal Render Pipeline (URP).
+This repository provides a lightweight Unity framework inspired by the custom Warcraft III map *Survival Chaos*.  It is meant as a learning playground or starting point for a more complete strategy game.  All Unity content lives in **calmproject2/** and the project targets **Unity&nbsp;2022.3 LTS** using the Universal Render Pipeline (URP).
 
 ---
 
@@ -33,6 +32,22 @@ The starter includes minimal implementations of several gameplay systems:
 | **HeroManager** | Handles hero-summon cooldowns and instantiation. |
 | **SpecialWeaponManager** | Manages global-weapon cooldowns and firing. |
 | **EventBus** | Lightweight publish/subscribe utility that decouples all of the above systems. |
+| **MatchmakingManager** | Example implementation of a simple Elo-based 4-player queue. |
+
+### Multiplayer Matchmaking
+
+The sample project includes a very small **MatchmakingManager** and helper
+classes that implement an Elo-based queue for four-player matches. Every second
+the queue is sorted by rating, and groups whose rating spread falls within each
+player's growing tolerance are popped and handed off to `GameManager`.
+
+### Player Profiles & Statistics
+
+Persistent data for each player lives in the `User` class. It exposes methods
+to record match results, units produced or destroyed, gold spending and more.
+The class keeps running totals of gold and crystal earned, calculates win rate,
+tracks which races a player uses most often and stores damage or unit-count
+metrics for richer post-game analytics.
 
 ---
 
@@ -46,4 +61,4 @@ The starter includes minimal implementations of several gameplay systems:
 
 Basic unit combat has been implemented in `UnitController`. Attach the script to a prefab and assign a `UnitData` asset with `baseHP`, `baseAttack`, `attackCooldown`, and `attackRange` values. When spawned, units will look for the closest enemy within range and automatically deal damage every `attackCooldown` seconds. Units are destroyed when their health reaches zero.
 
-Happy modding!
+Enjoy experimenting and expanding upon the foundation provided here!
