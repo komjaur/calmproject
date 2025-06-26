@@ -13,14 +13,11 @@ public IReadOnlyList<MatchmakingTicket> QueueReadOnly      => _queue;
 public IReadOnlyCollection<Match>       ReadyMatchesReadOnly => _readyMatches;
 
         private const int PLAYERS_PER_MATCH = 4;
-        private const int START_TOLERANCE = 50;  // ±Elo
-        private const int TOLERANCE_STEP = 25;  // widens per scan
         private const float CHECK_INTERVAL = 1.0f;
 
         private readonly List<MatchmakingTicket> _queue = new();
         private readonly Queue<Match> _readyMatches = new();
 
-        private int _tolerance = START_TOLERANCE;
         private float _nextScan = 0f;
 
         private void Awake()
@@ -41,7 +38,11 @@ public IReadOnlyCollection<Match>       ReadyMatchesReadOnly => _readyMatches;
                 int min = _queue[i].Elo;
                 int max = _queue[i + PLAYERS_PER_MATCH - 1].Elo;
 
-                if (max - min <= _tolerance)
+                int tolerance = int.MaxValue;
+                for (int p = 0; p < PLAYERS_PER_MATCH; ++p)
+                    tolerance = System.Math.Min(tolerance, _queue[i + p].CurrentTolerance);
+
+                if (max - min <= tolerance)
                 {
                     var players = new List<PlayerInfo>(PLAYERS_PER_MATCH);
                     for (int p = 0; p < PLAYERS_PER_MATCH; ++p)
@@ -53,7 +54,6 @@ public IReadOnlyCollection<Match>       ReadyMatchesReadOnly => _readyMatches;
                 else
                     ++i;
             }
-            _tolerance += TOLERANCE_STEP;
         }
 
         // --------------------------- Public API -----------------------------

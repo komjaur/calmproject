@@ -38,8 +38,10 @@ The starter includes minimal implementations of several gameplay systems:
 
 The sample project includes a very small **MatchmakingManager** and helper
 classes that implement an Elo-based queue for four-player matches. Every second
-the queue is sorted by rating, and groups whose rating spread falls within each
-player's growing tolerance are popped and handed off to `GameManager`.
+the queue is sorted by rating, and groups whose rating spread falls within the
+smallest tolerance of the waiting players are popped and handed off to
+`GameManager`. Each ticket widens its own tolerance over time so longer-waiting
+players match more quickly without forcing global settings.
 
 Matchmaking supports two **match types**:
  - **Normal** – each player keeps their chosen race.
