@@ -727,71 +727,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 999957be37049dd4388c744b75fa718d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  players:
-  - id: 0
-    race: 0
-    color:
-      r: 0.90588236
-      g: 0.29803923
-      b: 0.23529412
-      a: 1
-    elo: 1200
-  - id: 1
-    race: 1
-    color:
-      r: 0.16078432
-      g: 0.5019608
-      b: 0.7254902
-      a: 1
-    elo: 1180
-  - id: 2
-    race: 1
-    color:
-      r: 0.18039216
-      g: 0.8
-      b: 0.44313726
-      a: 1
-    elo: 1230
-  - id: 3
-    race: 2
-    color:
-      r: 0.94509804
-      g: 0.76862746
-      b: 0.05882353
-      a: 1
-    elo: 1215
-  - id: 4
-    race: 2
-    color:
-      r: 0.94509804
-      g: 0.76862746
-      b: 0.05882353
-      a: 1
-    elo: 1215
-  - id: 5
-    race: 2
-    color:
-      r: 0.94509804
-      g: 0.76862746
-      b: 0.05882353
-      a: 1
-    elo: 1215
-  - id: 6
-    race: 2
-    color:
-      r: 0.94509804
-      g: 0.76862746
-      b: 0.05882353
-      a: 1
-    elo: 1215
-  - id: 7
-    race: 2
-    color:
-      r: 0.94509804
-      g: 0.76862746
-      b: 0.05882353
-      a: 1
-    elo: 1215
 --- !u!4 &2044266876
 Transform:
   m_ObjectHideFlags: 0
@@ -852,6 +787,7 @@ MonoBehaviour:
       AveragePlaytimePerMatch: 0
       Gold: 0
       Crystal: 0
+      Elo: 0
     preferredRace: 0
     color: {r: 0, g: 0, b: 0, a: 0}
     wantToPlay: 1
@@ -863,6 +799,7 @@ MonoBehaviour:
       AveragePlaytimePerMatch: 0
       Gold: 0
       Crystal: 0
+      Elo: 0
     preferredRace: 0
     color: {r: 0, g: 0, b: 0, a: 0}
     wantToPlay: 1
@@ -874,6 +811,7 @@ MonoBehaviour:
       AveragePlaytimePerMatch: 0
       Gold: 0
       Crystal: 0
+      Elo: 0
     preferredRace: 0
     color: {r: 0, g: 0, b: 0, a: 0}
     wantToPlay: 1
@@ -885,6 +823,7 @@ MonoBehaviour:
       AveragePlaytimePerMatch: 0
       Gold: 0
       Crystal: 0
+      Elo: 0
     preferredRace: 0
     color: {r: 0, g: 0, b: 0, a: 0}
     wantToPlay: 1
@@ -896,9 +835,10 @@ MonoBehaviour:
       AveragePlaytimePerMatch: 0
       Gold: 0
       Crystal: 0
+      Elo: 0
     preferredRace: 0
     color: {r: 0, g: 0, b: 0, a: 0}
-    wantToPlay: 1
+    wantToPlay: 0
 --- !u!114 &2044266880
 MonoBehaviour:
   m_ObjectHideFlags: 0
