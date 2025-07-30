@@ -1,0 +1,9 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/MainMenuStyle.uss?fileID=7433441132597879392&amp;guid=6786292436358c446bda00ed8d1b452b&amp;type=3#MainMenuStyle" />
+    <engine:VisualElement name="Container" style="flex-grow: 1; justify-content: flex-start; align-items: center;">
+        <engine:Label text="Queue" name="header2" class="header" />
+        <engine:Button text="With Players" name="Button_QueuePlayers" class="button" />
+        <engine:Button text="With Bots" name="Button_QueueBots" class="button" />
+        <engine:Button text="Back" name="Button_Back" class="button" />
+    </engine:VisualElement>
+</engine:UXML>
